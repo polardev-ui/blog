@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Posts | Josh Clark's Blog</title>
+    <title>Blog | Josh Clark</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -30,6 +30,7 @@
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         /* Navigation */
@@ -113,17 +114,20 @@
             width: 100%;
         }
 
-        /* Main Content */
-        main {
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 8rem 2rem 4rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            position: relative;
         }
 
-        .page-header {
+        .hero-content {
+            max-width: 800px;
             text-align: center;
-            margin-bottom: 4rem;
-            animation: fadeInUp 0.8s ease-out;
+            animation: fadeInUp 1s ease-out;
         }
 
         @keyframes fadeInUp {
@@ -137,161 +141,155 @@
             }
         }
 
-        .page-title {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            line-height: 1.1;
-        }
-
-        .page-subtitle {
-            font-size: clamp(1rem, 2vw, 1.2rem);
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        /* Posts Grid */
-        .posts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .post-card {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeInUp 0.6s ease-out both;
-            position: relative;
-        }
-
-        .post-card:nth-child(1) { animation-delay: 0.1s; }
-        .post-card:nth-child(2) { animation-delay: 0.2s; }
-        .post-card:nth-child(3) { animation-delay: 0.3s; }
-        .post-card:nth-child(4) { animation-delay: 0.4s; }
-        .post-card:nth-child(5) { animation-delay: 0.5s; }
-        .post-card:nth-child(6) { animation-delay: 0.6s; }
-
-        .post-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-            border-color: rgba(0, 0, 0, 0.2);
-        }
-
-        .post-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #1a1a1a, #4a4a4a);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s ease;
-        }
-
-        .post-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .post-content {
-            padding: 2rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .post-meta {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .post-date {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .post-tag {
-            font-size: 0.75rem;
-            color: var(--accent);
-            background: rgba(0, 0, 0, 0.05);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .post-title {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 1.75rem;
-            font-weight: 400;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            line-height: 1.3;
-        }
-
-        .post-excerpt {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            font-weight: 300;
-            margin-bottom: 1.5rem;
-            flex: 1;
-        }
-
-        .post-link {
+        .badge {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--accent);
-            transition: gap 0.3s ease;
+            background: var(--bg-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            animation: fadeInUp 1s ease-out 0.2s both;
         }
 
-        .post-link::after {
+        .badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        h1 .name {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 400;
+            display: block;
+            background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 400;
+            line-height: 1.8;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .info-value a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .info-value a:hover {
+            color: var(--accent);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary::after {
             content: '→';
             transition: transform 0.3s ease;
         }
 
-        .post-card:hover .post-link {
-            gap: 0.75rem;
-        }
-
-        .post-card:hover .post-link::after {
+        .btn-primary:hover::after {
             transform: translateX(4px);
         }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            animation: fadeInUp 0.8s ease-out;
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
 
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        .empty-state-text {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow);
         }
 
         /* Mobile Menu */
@@ -312,7 +310,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Responsive Design */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .nav-container {
                 padding: 1rem 1.5rem;
@@ -344,21 +342,21 @@
                 pointer-events: all;
             }
 
-            main {
+            .hero {
                 padding: 6rem 1.5rem 3rem;
             }
 
-            .posts-grid {
+            .info-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
             }
 
-            .page-header {
-                margin-bottom: 3rem;
+            .cta-buttons {
+                flex-direction: column;
             }
 
-            .post-content {
-                padding: 1.5rem;
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
 
@@ -367,16 +365,9 @@
                 padding: 1rem;
             }
 
-            .post-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .posts-grid {
-                grid-template-columns: repeat(3, 1fr);
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
             }
         }
     </style>
@@ -399,42 +390,50 @@
         </div>
     </nav>
 
-    <main>
-        <div class="page-header">
-            <h1 class="page-title">Blog Posts</h1>
-            <p class="page-subtitle">Thoughts, ideas, and random musings</p>
-        </div>
-
-        <div class="posts-grid">
-            <a href="posts/understanding-the-4th-dimension/index.html" class="post-card">
-                <div class="post-content">
-                    <div class="post-meta">
-                        <span class="post-date">February 2, 2026</span>
-                        <span class="post-tag">Physics</span>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Personal Blog
+            </div>
+            <h1>
+                Hi, I'm
+                <span class="name">Josh Clark</span>
+            </h1>
+            <p class="subtitle">
+                Welcome to my personal blog where I ramble about random stuff that interests me. 
+                Just my thoughts, musings, and whatever I feel like writing about.
+            </p>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-label">Main Site</div>
+                    <div class="info-value">
+                        <a href="https://wsgpolar.me" target="_blank">wsgpolar.me</a>
                     </div>
-                    <h2 class="post-title">Understanding the 4th Dimension</h2>
-                    <p class="post-excerpt">
-                        Exploring time as the 4th dimension and what it would really mean to control it. A deep dive into theoretical physics and the nature of reality.
-                    </p>
-                    <span class="post-link">Read more</span>
                 </div>
-            </a>
-
-            <a href="posts/how-ai-neural-networks-work/index.html" class="post-card">
-                <div class="post-content">
-                    <div class="post-meta">
-                        <span class="post-date">February 2, 2026</span>
-                        <span class="post-tag">AI/ML</span>
+                <div class="info-card">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">
+                        <a href="mailto:josh@wsgpolar.me">josh@wsgpolar.me</a>
                     </div>
-                    <h2 class="post-title">How AI Neural Networks Work</h2>
-                    <p class="post-excerpt">
-                        A comprehensive guide to understanding neural networks, from basic concepts to implementation, with real code examples and detailed explanations.
-                    </p>
-                    <span class="post-link">Read more</span>
                 </div>
-            </a>
+                <div class="info-card">
+                    <div class="info-label">Other Contact</div>
+                    <div class="info-value">
+                        <a href="https://wsgpolar.me" target="_blank">On main website</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="blogs.html" class="btn btn-primary">Read My Blog Posts</a>
+                <a href="https://wsgpolar.me" class="btn btn-secondary" target="_blank">View Portfolio</a>
+            </div>
         </div>
-    </main>
+    </section>
 
     <script>
         function toggleMenu() {
@@ -445,6 +444,7 @@
         // Close menu when clicking outside
         document.addEventListener('click', function(event) {
             const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.querySelector('.menu-toggle');
             
             if (!event.target.closest('nav')) {
                 navLinks.classList.remove('active');
