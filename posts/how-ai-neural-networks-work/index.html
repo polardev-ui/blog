@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How AI Neural Networks Work | Josh Clark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f5f1e8;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --accent: #000000;
+            --accent-hover: #333;
+            --border: rgba(0, 0, 0, 0.1);
+            --shadow: rgba(0, 0, 0, 0.08);
+            --code-bg: #f8f8f8;
+            --code-border: #e0e0e0;
+        }
+
+        body {
+            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 241, 232, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo:hover {
+            opacity: 0.7;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 400;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav a.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Article */
+        article {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            min-height: 80vh;
+        }
+
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .article-date {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .article-tag {
+            font-size: 0.75rem;
+            color: var(--accent);
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .article-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .content {
+            line-height: 1.8;
+            font-size: 1.05rem;
+            font-weight: 300;
+            color: var(--text-primary);
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .content h2 {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin: 3rem 0 1.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .content h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        .content strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .content ul, .content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .content li {
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
+
+        /* Code Blocks */
+        .content pre {
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .content code {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #c7254e;
+        }
+
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        .code-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .menu-toggle span {
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 70px;
+                height: calc(100vh - 70px);
+                z-index: 998;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            article {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem 1.5rem;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+                pointer-events: none;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .container {
+                padding: 5rem 1.5rem 3rem;
+            }
+
+            article {
+                padding: 1.5rem;
+            }
+
+            .content pre {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="../../blog.html" class="logo">JC</a>
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="../../blog.html">Home</a></li>
+                <li><a href="../../blogs.html">Blog Posts</a></li>
+                <li><a href="https://wsgpolar.me" target="_blank">Main Site</a></li>
+                <li><a href="mailto:josh@wsgpolar.me">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Blog Posts</div>
+            <ul class="sidebar-nav">
+                <li><a href="../understanding-the-4th-dimension/index.html">Understanding the 4th Dimension</a></li>
+                <li><a href="../how-ai-neural-networks-work/index.html" class="active">How AI Neural Networks Work</a></li>
+            </ul>
+        </aside>
+
+        <article>
+            <div class="article-header">
+                <div class="article-meta">
+                    <span class="article-date">February 2, 2026</span>
+                    <span class="article-tag">AI & Machine Learning</span>
+                </div>
+                <h1>How AI Neural Networks Work</h1>
+                <p class="article-subtitle">
+                    A comprehensive guide to understanding neural networks, from basic concepts to implementation, with real code examples.
+                </p>
+            </div>
+
+            <div class="content">
+                <p>
+                    Artificial Intelligence has become ubiquitous, but how does it actually work? At the heart of modern AI systems are neural networks—computational models inspired by the human brain. Let's dive deep into how these fascinating systems operate.
+                </p>
+
+                <h2>What Are Neural Networks?</h2>
+
+                <p>
+                    Neural networks are computing systems inspired by biological neural networks in animal brains. They consist of interconnected nodes (neurons) organized in layers that process information by responding to inputs and learning from examples.
+                </p>
+
+                <p>
+                    A basic neural network has three types of layers:
+                </p>
+
+                <ul>
+                    <li><strong>Input Layer:</strong> Receives the raw data (images, text, numbers, etc.)</li>
+                    <li><strong>Hidden Layers:</strong> Process the information through weighted connections</li>
+                    <li><strong>Output Layer:</strong> Produces the final prediction or classification</li>
+                </ul>
+
+                <h2>The Building Blocks: Neurons</h2>
+
+                <p>
+                    Each neuron performs a simple calculation. It takes multiple inputs, multiplies each by a weight, adds them together, adds a bias term, and passes the result through an activation function.
+                </p>
+
+                <p>
+                    Mathematically, a single neuron computes: <strong>output = activation(Σ(weight × input) + bias)</strong>
+                </p>
+
+                <h3>A Simple Neuron in Python</h3>
+
+                <div class="code-label">Python</div>
+                <pre><code>import numpy as np
+
+class Neuron:
+    def __init__(self, num_inputs):
+        # Initialize random weights and bias
+        self.weights = np.random.randn(num_inputs)
+        self.bias = np.random.randn()
+    
+    def activate(self, x):
+        # Sigmoid activation function
+        return 1 / (1 + np.exp(-x))
+    
+    def forward(self, inputs):
+        # Calculate weighted sum
+        total = np.dot(self.weights, inputs) + self.bias
+        # Apply activation function
+        return self.activate(total)
+
+# Example usage
+neuron = Neuron(3)
+inputs = np.array([0.5, -0.2, 0.1])
+output = neuron.forward(inputs)
+print(f"Neuron output: {output}")</code></pre>
+
+                <h2>Activation Functions</h2>
+
+                <p>
+                    Activation functions introduce non-linearity into the network, allowing it to learn complex patterns. Without them, neural networks would just be linear regression models, no matter how many layers you add.
+                </p>
+
+                <h3>Common Activation Functions</h3>
+
+                <div class="code-label">Python</div>
+                <pre><code>import numpy as np
+
+# Sigmoid: Outputs between 0 and 1
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# ReLU (Rectified Linear Unit): Most popular for hidden layers
+def relu(x):
+    return np.maximum(0, x)
+
+# Tanh: Outputs between -1 and 1
+def tanh(x):
+    return np.tanh(x)
+
+# Softmax: Used for multi-class classification
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))
+    return exp_x / exp_x.sum()
+
+# Example
+x = np.array([-2, -1, 0, 1, 2])
+print(f"ReLU: {relu(x)}")
+print(f"Sigmoid: {sigmoid(x)}")</code></pre>
+
+                <h2>Building a Neural Network</h2>
+
+                <p>
+                    Now let's build a complete neural network from scratch. This network will have an input layer, one hidden layer, and an output layer.
+                </p>
+
+                <div class="code-label">Python</div>
+                <pre><code>import numpy as np
+
+class NeuralNetwork:
+    def __init__(self, input_size, hidden_size, output_size):
+        # Initialize weights randomly
+        self.W1 = np.random.randn(input_size, hidden_size) * 0.01
+        self.b1 = np.zeros((1, hidden_size))
+        self.W2 = np.random.randn(hidden_size, output_size) * 0.01
+        self.b2 = np.zeros((1, output_size))
+    
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+    
+    def sigmoid_derivative(self, x):
+        return x * (1 - x)
+    
+    def forward(self, X):
+        # Hidden layer
+        self.z1 = np.dot(X, self.W1) + self.b1
+        self.a1 = self.sigmoid(self.z1)
+        
+        # Output layer
+        self.z2 = np.dot(self.a1, self.W2) + self.b2
+        self.a2 = self.sigmoid(self.z2)
+        
+        return self.a2
+    
+    def backward(self, X, y, output, learning_rate):
+        # Calculate gradients
+        m = X.shape[0]
+        
+        # Output layer gradients
+        dz2 = output - y
+        dW2 = (1/m) * np.dot(self.a1.T, dz2)
+        db2 = (1/m) * np.sum(dz2, axis=0, keepdims=True)
+        
+        # Hidden layer gradients
+        dz1 = np.dot(dz2, self.W2.T) * self.sigmoid_derivative(self.a1)
+        dW1 = (1/m) * np.dot(X.T, dz1)
+        db1 = (1/m) * np.sum(dz1, axis=0, keepdims=True)
+        
+        # Update weights
+        self.W2 -= learning_rate * dW2
+        self.b2 -= learning_rate * db2
+        self.W1 -= learning_rate * dW1
+        self.b1 -= learning_rate * db1
+    
+    def train(self, X, y, epochs, learning_rate):
+        for epoch in range(epochs):
+            # Forward pass
+            output = self.forward(X)
+            
+            # Backward pass
+            self.backward(X, y, output, learning_rate)
+            
+            # Print loss every 100 epochs
+            if epoch % 100 == 0:
+                loss = np.mean((output - y) ** 2)
+                print(f"Epoch {epoch}, Loss: {loss:.4f}")
+
+# Example: XOR problem
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])
+
+# Create and train network
+nn = NeuralNetwork(input_size=2, hidden_size=4, output_size=1)
+nn.train(X, y, epochs=1000, learning_rate=0.5)
+
+# Test predictions
+print("\nPredictions:")
+for i in range(len(X)):
+    prediction = nn.forward(X[i:i+1])
+    print(f"Input: {X[i]} -> Prediction: {prediction[0][0]:.4f} (Target: {y[i][0]})")</code></pre>
+
+                <h2>The Training Process</h2>
+
+                <p>
+                    Training a neural network involves several key steps that repeat over many iterations:
+                </p>
+
+                <ol>
+                    <li><strong>Forward Propagation:</strong> Pass input data through the network to get predictions</li>
+                    <li><strong>Calculate Loss:</strong> Measure how wrong the predictions are using a loss function</li>
+                    <li><strong>Backward Propagation:</strong> Calculate gradients showing how to adjust weights to reduce loss</li>
+                    <li><strong>Update Weights:</strong> Adjust weights in the direction that reduces loss</li>
+                    <li><strong>Repeat:</strong> Continue for many epochs until the network learns</li>
+                </ol>
+
+                <h2>Using Modern Frameworks: PyTorch</h2>
+
+                <p>
+                    While building networks from scratch is educational, in practice we use frameworks like PyTorch or TensorFlow. Here's the same network in PyTorch:
+                </p>
+
+                <div class="code-label">Python</div>
+                <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Define the network
+class SimpleNN(nn.Module):
+    def __init__(self):
+        super(SimpleNN, self).__init__()
+        self.hidden = nn.Linear(2, 4)
+        self.output = nn.Linear(4, 1)
+        self.sigmoid = nn.Sigmoid()
+    
+    def forward(self, x):
+        x = self.sigmoid(self.hidden(x))
+        x = self.sigmoid(self.output(x))
+        return x
+
+# Prepare data
+X = torch.tensor([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=torch.float32)
+y = torch.tensor([[0], [1], [1], [0]], dtype=torch.float32)
+
+# Create model, loss function, and optimizer
+model = SimpleNN()
+criterion = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.5)
+
+# Training loop
+for epoch in range(1000):
+    # Forward pass
+    outputs = model(X)
+    loss = criterion(outputs, y)
+    
+    # Backward pass and optimization
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    
+    if epoch % 100 == 0:
+        print(f'Epoch {epoch}, Loss: {loss.item():.4f}')
+
+# Test the model
+with torch.no_grad():
+    predictions = model(X)
+    print("\nPredictions:")
+    for i in range(len(X)):
+        print(f"Input: {X[i].numpy()} -> Prediction: {predictions[i].item():.4f}")</code></pre>
+
+                <h2>Deep Learning: Going Deeper</h2>
+
+                <p>
+                    Deep learning simply means using neural networks with many hidden layers. More layers allow the network to learn hierarchical representations—lower layers learn simple features, while deeper layers combine them into complex patterns.
+                </p>
+
+                <div class="code-label">Python</div>
+                <pre><code>import torch.nn as nn
+
+class DeepNN(nn.Module):
+    def __init__(self, input_size, hidden_sizes, output_size):
+        super(DeepNN, self).__init__()
+        
+        # Create layers dynamically
+        layers = []
+        prev_size = input_size
+        
+        for hidden_size in hidden_sizes:
+            layers.append(nn.Linear(prev_size, hidden_size))
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(0.2))  # Prevent overfitting
+            prev_size = hidden_size
+        
+        layers.append(nn.Linear(prev_size, output_size))
+        
+        self.network = nn.Sequential(*layers)
+    
+    def forward(self, x):
+        return self.network(x)
+
+# Example: Deep network with 5 hidden layers
+model = DeepNN(
+    input_size=784,      # e.g., 28x28 image flattened
+    hidden_sizes=[512, 256, 128, 64, 32],
+    output_size=10       # e.g., 10 classes
+)
+
+print(model)</code></pre>
+
+                <h2>Real-World Application: Image Classification</h2>
+
+                <p>
+                    Let's build a convolutional neural network (CNN) for image classification using PyTorch. CNNs are specialized for processing grid-like data such as images.
+                </p>
+
+                <div class="code-label">Python</div>
+                <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision
+import torchvision.transforms as transforms
+
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        # Convolutional layers
+        self.conv1 = nn.Conv2d(1, 32, 3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        
+        # Fully connected layers
+        self.fc1 = nn.Linear(64 * 7 * 7, 128)
+        self.fc2 = nn.Linear(128, 10)
+        self.dropout = nn.Dropout(0.25)
+    
+    def forward(self, x):
+        # Convolutional layers with ReLU and pooling
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        
+        # Flatten
+        x = x.view(-1, 64 * 7 * 7)
+        
+        # Fully connected layers
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
+# Load MNIST dataset
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
+
+trainset = torchvision.datasets.MNIST(
+    root='./data', train=True, download=True, transform=transform
+)
+trainloader = torch.utils.data.DataLoader(
+    trainset, batch_size=64, shuffle=True
+)
+
+# Initialize model
+model = CNN()
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+# Training
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+
+for epoch in range(5):
+    running_loss = 0.0
+    for i, (images, labels) in enumerate(trainloader):
+        images, labels = images.to(device), labels.to(device)
+        
+        # Forward pass
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        running_loss += loss.item()
+        
+        if i % 100 == 0:
+            print(f'Epoch {epoch+1}, Batch {i}, Loss: {loss.item():.4f}')
+
+print("Training complete!")</code></pre>
+
+                <h2>Key Concepts Summary</h2>
+
+                <ul>
+                    <li><strong>Neurons:</strong> Basic computational units that perform weighted sums and apply activation functions</li>
+                    <li><strong>Layers:</strong> Groups of neurons organized to process information hierarchically</li>
+                    <li><strong>Weights & Biases:</strong> Learnable parameters that the network adjusts during training</li>
+                    <li><strong>Forward Propagation:</strong> Passing data through the network to generate predictions</li>
+                    <li><strong>Loss Function:</strong> Measures the difference between predictions and actual values</li>
+                    <li><strong>Backpropagation:</strong> Algorithm for calculating gradients to update weights</li>
+                    <li><strong>Gradient Descent:</strong> Optimization method that adjusts weights to minimize loss</li>
+                    <li><strong>Epochs:</strong> Complete passes through the entire training dataset</li>
+                </ul>
+
+                <h2>The Complete Process</h2>
+
+                <p>
+                    To create, train, and execute an AI neural network:
+                </p>
+
+                <ol>
+                    <li><strong>Define Architecture:</strong> Choose number of layers, neurons per layer, and activation functions</li>
+                    <li><strong>Initialize Parameters:</strong> Set initial random weights and biases</li>
+                    <li><strong>Prepare Data:</strong> Load, normalize, and split your dataset into training/validation/test sets</li>
+                    <li><strong>Training Loop:</strong>
+                        <ul>
+                            <li>Forward pass: Generate predictions</li>
+                            <li>Calculate loss: Measure prediction error</li>
+                            <li>Backward pass: Compute gradients</li>
+                            <li>Update weights: Apply gradient descent</li>
+                        </ul>
+                    </li>
+                    <li><strong>Validation:</strong> Test on unseen data to check for overfitting</li>
+                    <li><strong>Fine-tune:</strong> Adjust hyperparameters (learning rate, batch size, architecture)</li>
+                    <li><strong>Deploy:</strong> Save the trained model and use it for predictions</li>
+                </ol>
+
+                <h2>Conclusion</h2>
+
+                <p>
+                    Neural networks are powerful tools that learn patterns from data through iterative optimization. While the math can seem complex, the core concepts are straightforward: neurons perform weighted sums, activation functions add non-linearity, and backpropagation updates weights to minimize errors.
+                </p>
+
+                <p>
+                    Modern frameworks like PyTorch and TensorFlow handle the complex mathematics behind the scenes, letting you focus on architecture design and solving real problems. The key to mastering neural networks is practice—start with simple problems, understand the fundamentals, and gradually tackle more complex challenges.
+                </p>
+
+                <p>
+                    The code examples above give you a solid foundation to start building your own AI systems. Experiment with different architectures, datasets, and hyperparameters to develop intuition for what works.
+                </p>
+            </div>
+        </article>
+    </div>
+
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close menu/sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (!event.target.closest('nav') && !event.target.closest('.menu-toggle')) {
+                navLinks.classList.remove('active');
+            }
+            
+            if (!event.target.closest('.sidebar') && !event.target.closest('.sidebar-toggle')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
